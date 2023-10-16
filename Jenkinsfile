@@ -12,7 +12,6 @@ node {
             sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
         }
 
-        // Langkah-langkah pasca pengujian
-        junit 'test-reports/results.xml'
+       
     }
 }
