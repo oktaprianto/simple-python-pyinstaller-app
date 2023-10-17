@@ -1,23 +1,33 @@
 node {
     stage('Build') {
-        docker.image('python:2').inside {
-            sh 'python -m py_compile sources/add2vals.py sources/calc.py'
+        node {
+            docker.image('python:2-alpine').inside {
+                sh 'python -m py_compile sources/add2vals.py sources/calc.py'
+            }
         }
     }
-
     stage('Test') {
-        docker.image('qnib/pytest').inside {
-            sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
+        node {
+            docker.image('qnib/pytest').inside {
+                sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
+            }
         }
-
-        junit 'test-reports/results.xml'
+        post {
+            always {
+                junit 'test-reports/results.xml'
+            }
+        }
     }
-
-    stage('Deliver') {
-        docker.image('python:2').inside {
-            sh 'pyinstaller --onefile sources/add2vals.py'
+    stage('Deploy') {
+        node {
+            docker.image('cdrx/pyinstaller-linux:python2').inside {
+                sh 'pyinstaller --onefile sources/add2vals.py'
+            }
         }
-
-        archiveArtifacts artifacts: 'dist/add2vals', onlyIfSuccessful: true
+        post {
+            success {
+                archiveArtifacts 'dist/add2vals'
+            }
+        }
     }
 }
