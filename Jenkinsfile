@@ -1,8 +1,9 @@
 node {
-    stage('Build') {
-        // Langkah-langkah untuk membangun proyek
+   stage('Build') {
+        def BUILD_DIR = pwd()
         docker.image('python:2-alpine').inside {
             sh 'python -m py_compile sources/add2vals.py sources/calc.py'
+            stash name: 'compiled-results', includes: 'sources/*.py*'
         }
     }
 
@@ -16,11 +17,12 @@ node {
         junit 'test-reports/results.xml'
     }
 
-   stage('Deliver') {
-        def VOLUME = "${pwd()}/sources:/src"
+      stage('Deliver') {
+        def BUILD_DIR = pwd()
+        def VOLUME = "${BUILD_DIR}/sources:/src"
         def IMAGE = 'cdrx/pyinstaller-linux:python2'
 
-        dir("${env.BUILD_ID}") {
+        dir("${BUILD_DIR}") {
             unstash 'compiled-results'
             sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
         }
