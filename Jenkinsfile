@@ -22,5 +22,5 @@ node {
         
         ssh remote-server 'cd /path/to/remote/project && git pull origin master && npm install && pm2 restart my-app'
     }
-}
+
 }
