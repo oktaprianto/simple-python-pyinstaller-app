@@ -27,6 +27,14 @@ pipeline {
                 }
             }
         }
+        stage('Manual Approval') {
+            input {
+                message "Lanjutkan ke tahap Deploy?"
+                parameters {
+                    choice(name: 'PILIHAN', choices: ['Proceed', 'Abort'], description: 'Pilih tindakan')
+                }
+            }
+        }
         stage('Deploy') {
             agent any
             environment {
@@ -37,6 +45,11 @@ pipeline {
                 dir(path: env.BUILD_ID) {
                     unstash(name: 'compiled-results')
                     sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
+                }
+                script {
+                     // Menjeda eksekusi pipeline selama 1 menit (60 detik)
+                    echo 'Menjeda eksekusi pipeline selama 1 menit...'
+                    sleep time: 60, unit: 'SECONDS'
                 }
             }
             post {
