@@ -47,7 +47,7 @@ pipeline {
                     sh "docker run --rm -v ${VOLUME} ${IMAGE} 'pyinstaller -F add2vals.py'"
                 }
                 script {
-                     // Menjeda eksekusi pipeline selama 1 menit (60 detik)
+                    // Menjeda eksekusi pipeline selama 1 menit (60 detik)
                     echo 'Menjeda eksekusi pipeline selama 1 menit...'
                     sleep time: 60, unit: 'SECONDS'
                 }
