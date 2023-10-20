@@ -27,14 +27,17 @@ pipeline {
                 }
             }
         }
-        stage('Manual Approval') {
-            input {
-                message "Lanjutkan ke tahap Deploy?"
-                parameters {
-                    choice(name: 'PILIHAN', choices: ['Proceed', 'Abort'], description: 'Pilih tindakan')
+               stage('Manual Approval') {
+            steps {
+                script {
+                    def userInput = input(message: 'Lanjutkan ke tahap Deploy?', ok: 'Proceed', parameters: [choice(choices: ['Proceed', 'Abort'], description: 'Pilih tindakan', name: 'ACTION')])
+                    if (userInput == 'Abort') {
+                        error 'Pipeline dihentikan oleh pengguna'
+                    }
                 }
             }
         }
+
         stage('Deploy') {
             agent any
             environment {
